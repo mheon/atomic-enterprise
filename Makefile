@@ -88,9 +88,9 @@ test:
 	KUBE_RACE=" " hack/test-integration-docker.sh
 	hack/test-end-to-end-docker.sh
 	hack/test-end-to-end.sh
-ifeq ($(EXTENDED),true)
-	hack/test-extended.sh
-endif
+#ifeq ($(EXTENDED),true)
+#	hack/test-extended.sh
+#endif
 .PHONY: test
 
 # Run All-in-one OpenShift server.
