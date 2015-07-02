@@ -105,6 +105,7 @@ function wait_for_app() {
   wait_for_command '[[ "$(curl -s http://${FRONTEND_IP}:5432/keys/foo)" = "1337" ]]'
 }
 
+# TODO remove this
 # Wait for builds to complete
 # $1 namespace
 function wait_for_build() {
@@ -162,12 +163,14 @@ echo "[INFO] Login"
 oc login localhost:8443 -u test -p test --insecure-skip-tls-verify
 oc new-project test
 
-echo "[INFO] Applying STI application config"
-oc new-app -f examples/sample-app/application-template-stibuild.json
+# The STI system has been removed, disable this
+#echo "[INFO] Applying STI application config"
+#oc new-app -f examples/sample-app/application-template-stibuild.json
 
-# Wait for build which should have triggered automatically
-echo "[INFO] Starting build..."
-#oc start-build -n test ruby-sample-build --follow
-wait_for_build "test"
-wait_for_app "test"
+# Builders have been removed, disable this
+## Wait for build which should have triggered automatically
+#echo "[INFO] Starting build..."
+##oc start-build -n test ruby-sample-build --follow
+#wait_for_build "test"
+#wait_for_app "test"
 

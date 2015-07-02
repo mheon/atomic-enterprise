@@ -70,6 +70,8 @@ NODE_CONFIG_DIR="${SERVER_CONFIG_DIR}/node-${KUBELET_HOST}"
 # used as a resolve IP to test routing
 CONTAINER_ACCESSIBLE_API_HOST="${CONTAINER_ACCESSIBLE_API_HOST:-172.17.42.1}"
 
+# TODO investigate which of these can be removed
+# Potentially all 3 config files and associated variables are not unnecessary?
 STI_CONFIG_FILE="${LOG_DIR}/stiAppConfig.json"
 DOCKER_CONFIG_FILE="${LOG_DIR}/dockerAppConfig.json"
 CUSTOM_CONFIG_FILE="${LOG_DIR}/customAppConfig.json"
@@ -169,6 +171,7 @@ function wait_for_app() {
 	wait_for_command '[[ "$(curl -s http://${FRONTEND_IP}:5432/keys/foo)" = "1337" ]]'
 }
 
+# TODO remove this
 # Wait for builds to complete
 # $1 namespace
 function wait_for_build() {
@@ -327,29 +330,34 @@ echo "[INFO] Back to 'default' project with 'admin' user..."
 oc project ${CLUSTER_ADMIN_CONTEXT}
 [ "$(oc whoami | grep 'system:admin')" ]
 
-# The build requires a dockercfg secret in the builder service account in order
-# to be able to push to the registry.  Make sure it exists first.
-echo "[INFO] Waiting for dockercfg secrets to be generated in project 'test' before building"
-wait_for_command "oc get -n test serviceaccount/builder -o yaml | grep dockercfg > /dev/null" $((60*TIME_SEC))
+# Disable this, we aren't building, why do we need secrets
+## The build requires a dockercfg secret in the builder service account in order
+## to be able to push to the registry.  Make sure it exists first.
+#echo "[INFO] Waiting for dockercfg secrets to be generated in project 'test' before building"
+#wait_for_command "oc get -n test serviceaccount/builder -o yaml | grep dockercfg > /dev/null" $((60*TIME_SEC))
 
-# Process template and create
-echo "[INFO] Submitting application template json for processing..."
-oc process -n test -f examples/sample-app/application-template-stibuild.json > "${STI_CONFIG_FILE}"
-oc process -n docker -f examples/sample-app/application-template-dockerbuild.json > "${DOCKER_CONFIG_FILE}"
-oc process -n custom -f examples/sample-app/application-template-custombuild.json > "${CUSTOM_CONFIG_FILE}"
+# Disable this, we don't need config files for builds that aren't happening
+## Process template and create
+#echo "[INFO] Submitting application template json for processing..."
+#oc process -n test -f examples/sample-app/application-template-stibuild.json > "${STI_CONFIG_FILE}"
+#oc process -n docker -f examples/sample-app/application-template-dockerbuild.json > "${DOCKER_CONFIG_FILE}"
+#oc process -n custom -f examples/sample-app/application-template-custombuild.json > "${CUSTOM_CONFIG_FILE}"
 
 echo "[INFO] Back to 'test' context with 'e2e-user' user"
 oc project test
 
-echo "[INFO] Applying STI application config"
-oc create -f "${STI_CONFIG_FILE}"
+# Disable this, we aren't building an STI application
+#echo "[INFO] Applying STI application config"
+#oc create -f "${STI_CONFIG_FILE}"
 
-# Wait for build which should have triggered automatically
-echo "[INFO] Starting build from ${STI_CONFIG_FILE} and streaming its logs..."
-#oc start-build -n test ruby-sample-build --follow
-wait_for_build "test"
-wait_for_app "test"
+# Disable this, the STI builder has been ripped out
+## Wait for build which should have triggered automatically
+#echo "[INFO] Starting build from ${STI_CONFIG_FILE} and streaming its logs..."
+##oc start-build -n test ruby-sample-build --follow
+#wait_for_build "test"
+#wait_for_app "test"
 
+# Already disabled?
 #echo "[INFO] Applying Docker application config"
 #oc create -n docker -f "${DOCKER_CONFIG_FILE}"
 #echo "[INFO] Invoking generic web hook to trigger new docker build using curl"
@@ -357,6 +365,7 @@ wait_for_app "test"
 #wait_for_build "docker"
 #wait_for_app "docker"
 
+# Already disabled?
 #echo "[INFO] Applying Custom application config"
 #oc create -n custom -f "${CUSTOM_CONFIG_FILE}"
 #echo "[INFO] Invoking generic web hook to trigger new custom build using curl"
